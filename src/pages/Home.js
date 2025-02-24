@@ -1,26 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../styles/Home.css';
 import ChatBoxComponent from '../components/ChatBoxComponent';
 import QuizzesComponent from '../components/QuizzesComponent';
 import DocumentsComponent from '../components/DocumentsComponent';
 
 const Home = () => {
-  const handleDocumentUpload = async (file) => {
-    // Implement document upload logic here
-    console.log('Uploading file:', file);
+  const [selectedDocument, setSelectedDocument] = useState(null);
+  const [refreshDocs, setRefreshDocs] = useState(false);
+
+  const handleDocumentUpload = async (file, onProgress) => {
+    // Handle document upload logic here
+    // After successful upload, trigger documents refresh
+    setRefreshDocs(prev => !prev);
+  };
+
+  const handleSelectDocument = (document) => {
+    setSelectedDocument(document);
   };
 
   return (
     <div className="home-container">
-      <div className='main-container'>
-        {/* Left: Chat Box */}
+      <div className="main-container">
         <div className="chat-box-container">
-          <ChatBoxComponent />
+          <ChatBoxComponent 
+            selectedDocument={selectedDocument}
+            onDocumentUpload={handleDocumentUpload}
+          />
         </div>
-        {/* Right: Documents (top) & Quizzes (bottom) */}
         <div className="right-side">
-          <DocumentsComponent handleDocumentUpload={handleDocumentUpload} />
-          <QuizzesComponent />
+          <DocumentsComponent 
+            onSelectDocument={handleSelectDocument}
+            selectedDocument={selectedDocument}
+            onRefresh={refreshDocs}
+          />
+          <QuizzesComponent 
+            selectedDocument={selectedDocument}
+          />
         </div>
       </div>
     </div>
