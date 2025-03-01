@@ -2,170 +2,65 @@ import React, { useState, useEffect } from 'react';
 import '../styles/Quizzes.css';
 
 const QuizzesComponent = ({ selectedDocument }) => {
+  const [quizzes, setQuizzes] = useState([]);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Pre-loaded quizzes for each document
-  const documentQuizzes = {
-    1: [
-      { id: 1, title: "React Components" },
-      { id: 2, title: "React Hooks" },
-      { id: 3, title: "React Router" },
-      { id: 4, title: "State Management" }
-    ],
-    2: [
-      { id: 5, title: "Variables & Data Types" },
-      { id: 6, title: "Functions & Scope" },
-      { id: 7, title: "Arrays & Objects" },
-      { id: 8, title: "ES6 Features" }
-    ],
-    3: [
-      { id: 9, title: "Python Basics" },
-      { id: 10, title: "Functions" },
-      { id: 11, title: "OOP in Python" },
-      { id: 12, title: "File Handling" }
-    ],
-    4: [
-      { id: 13, title: "Arrays & Lists" },
-      { id: 14, title: "Stacks & Queues" },
-      { id: 15, title: "Trees & Graphs" },
-      { id: 16, title: "Sorting Algorithms" }
-    ]
-  };
-
-  // Reset state when selected document changes
+  // Fetch all quizzes when component mounts or document changes
   useEffect(() => {
+    if (selectedDocument) {
+      fetchQuizzes();
+    } else {
+      setQuizzes([]);
+    }
+    // Reset state when selected document changes
     setSelectedQuiz(null);
     setUserAnswers({});
     setCurrentQuestionIndex(0);
   }, [selectedDocument]);
 
-  if (!selectedDocument) {
-    return null;
-  }
-
-  const quizzes = documentQuizzes[selectedDocument.id] || [];
+  // Fetch all quizzes from the API
+  const fetchQuizzes = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/get-all-quizzes');
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      const data = await response.json();
+      
+      // Filter quizzes that match the selected document
+      const documentQuizzes = data.filter(quiz => 
+        quiz.document_name === selectedDocument.name
+      );
+      
+      setQuizzes(documentQuizzes);
+    } catch (error) {
+      console.error("Error fetching quizzes:", error);
+      setError("Failed to load quizzes. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleStartQuiz = async (quizId) => {
     setIsLoading(true);
+    setError(null);
     try {
-      // In a real app, this would be an API call to fetch quiz data
-      // For now, we'll simulate with a timeout and mock data based on the specified format
-      setTimeout(() => {
-        const mockQuizData = {
-          id: quizId,
-          title: quizzes.find(q => q.id === quizId).title,
-          document_name: selectedDocument.name,
-          created_at: "2025-02-19T02:19:41",
-          questions: [
-            {
-              id: 1,
-              question_text: "What literary device is predominantly used when comparing a component to a building block?",
-              hint: "Consider a comparison without using 'like' or 'as'.",
-              answers: [
-                {
-                  id: 1,
-                  answer_text: "Metaphor",
-                  is_correct_answer: true
-                },
-                {
-                  id: 2,
-                  answer_text: "Simile",
-                  is_correct_answer: false
-                },
-                {
-                  id: 3,
-                  answer_text: "Alliteration",
-                  is_correct_answer: false
-                },
-                {
-                  id: 4,
-                  answer_text: "Personification",
-                  is_correct_answer: false
-                }
-              ]
-            },
-            {
-              id: 2,
-              question_text: "True or False: React components must be classes.",
-              hint: "Think about functional components.",
-              answers: [
-                {
-                  id: 5,
-                  answer_text: "True",
-                  is_correct_answer: false
-                },
-                {
-                  id: 6,
-                  answer_text: "False",
-                  is_correct_answer: true
-                }
-              ]
-            },
-            {
-              id: 3,
-              question_text: "In her monologue, what does Juliet suggest about the importance of a name?",
-              hint: "Juliet questions the significance of the name Montague.",
-              answers: [
-                {
-                  id: 8,
-                  answer_text: "A name does not define the essence of a person.",
-                  is_correct_answer: true
-                },
-                {
-                  id: 10,
-                  answer_text: "A name is a symbol of one's family heritage.",
-                  is_correct_answer: false
-                },
-                {
-                  id: 7,
-                  answer_text: "A name is essential for one's identity.",
-                  is_correct_answer: false
-                },
-                {
-                  id: 9,
-                  answer_text: "A name should be changed to suit romantic desires.",
-                  is_correct_answer: false
-                }
-              ]
-            },
-            {
-              id: 4,
-              question_text: "What does Romeo mean when he says, 'With love’s light wings did I o’erperch these walls'?",
-              hint: "Think about how love motivates and empowers Romeo.",
-              answers: [
-                {
-                  id: 13,
-                  answer_text: "He built a ladder to climb over the wall.",
-                  is_correct_answer: false
-                },
-                {
-                  id: 14,
-                  answer_text: "He had help from Mercutio to climb the wall.",
-                  is_correct_answer: false
-                },
-                {
-                  id: 11,
-                  answer_text: "He used actual wings to fly over the wall.",
-                  is_correct_answer: false
-                },
-                {
-                  id: 12,
-                  answer_text: "His love for Juliet gave him the courage and motivation to overcome obstacles.",
-                  is_correct_answer: true
-                }
-              ]
-            }  
-          ]
-        };
-        
-        setSelectedQuiz(mockQuizData);
-        setIsLoading(false);
-      }, 1000);
+      const response = await fetch(`/api/get-selected-quiz/${quizId}`);
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      const quizData = await response.json();
+      setSelectedQuiz(quizData);
     } catch (error) {
       console.error("Error fetching quiz:", error);
+      setError("Failed to load quiz. Please try again later.");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -194,6 +89,10 @@ const QuizzesComponent = ({ selectedDocument }) => {
       [questionId]: answerId
     });
   };
+
+  if (!selectedDocument) {
+    return null;
+  }
 
   // Render the quiz content when a quiz is selected
   if (selectedQuiz) {
@@ -256,6 +155,21 @@ const QuizzesComponent = ({ selectedDocument }) => {
               Next
             </button>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error message if there's an error
+  if (error) {
+    return (
+      <div className="quizzes-section">
+        <h2>Available Quizzes</h2>
+        <div className="error-message">
+          <p>{error}</p>
+          <button className="quiz-btn" onClick={fetchQuizzes}>
+            Try Again
+          </button>
         </div>
       </div>
     );
