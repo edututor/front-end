@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Documents.css';
 
-const DocumentsComponent = ({ onSelectDocument, selectedDocument }) => {
+const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUploaded }) => {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,7 +26,16 @@ const DocumentsComponent = ({ onSelectDocument, selectedDocument }) => {
     };
 
     fetchDocuments();
-  }, []);
+  }, [newDocumentUploaded]); // Re-fetch when newDocumentUploaded changes
+
+  useEffect(() => {
+    if (newDocumentUploaded && documents.length > 0) {
+      const uploadedDoc = documents.find(doc => doc.name === newDocumentUploaded);
+      if (uploadedDoc) {
+        onSelectDocument(uploadedDoc);
+      }
+    }
+  }, [newDocumentUploaded, documents, onSelectDocument]);
 
   if (loading) {
     return <div className="documents-section">Loading documents...</div>;
@@ -46,7 +55,6 @@ const DocumentsComponent = ({ onSelectDocument, selectedDocument }) => {
             className={`document-item ${selectedDocument?.id === doc.id ? 'selected' : ''}`}
             onClick={() => {
               onSelectDocument(doc);
-              // Chat history renewal will be handled by the parent component via onSelectDocument
             }}
           >
             <span>{doc.name}</span>
