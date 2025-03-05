@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Documents.css';
 
+
 const API_URL = 'http://127.0.0.1:8002';
 
 const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUploaded }) => {
@@ -13,7 +14,9 @@ const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUpl
       setLoading(true);
       setError(null);
       try {
+
         const response = await fetch(`${API_URL}/api/documents`);
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

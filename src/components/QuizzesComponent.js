@@ -6,6 +6,7 @@ const API_URL = 'http://127.0.0.1:8001';
 
 const QuizzesComponent = ({ selectedDocument }) => {
   const [quizzes, setQuizzes] = useState([]);
+
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
@@ -93,9 +94,11 @@ const QuizzesComponent = ({ selectedDocument }) => {
     });
   };
 
+
   if (!selectedDocument) {
     return null;
   }
+
 
   // Render the quiz content when a quiz is selected
   if (selectedQuiz) {
@@ -159,15 +162,18 @@ const QuizzesComponent = ({ selectedDocument }) => {
             </button>
           </div>
         </div>
+
       </div>
     );
   }
 
   // Show error message if there's an error
+
   if (error) {
     return (
       <div className="quizzes-section">
         <h2>Available Quizzes</h2>
+
         <div className="error-message">
           <p>{error}</p>
           <button className="quiz-btn" onClick={fetchQuizzes}>
