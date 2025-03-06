@@ -77,3 +77,71 @@
 .view-doc-btn.selected {
   background: var(--accent-hover);
 }
+
+.documents-section {
+  background: var(--bg-secondary);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.documents-section h2 {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.loading {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 20px;
+}
+
+.error-message {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.no-documents {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 20px;
+  background: var(--input-bg);
+  border-radius: 10px;
+  border: 1px dashed var(--border-color);
+}
+
+.file-upload-container {
+  margin-top: 20px;
+}
+
+.file-upload-input {
+  display: none;
+}
+
+.file-upload-label {
+  display: inline-block;
+  padding: 12px 20px;
+  background-color: #f7941d;
+  color: white;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.file-upload-label:hover {
+  background-color: #e68a1c;
+}
+
+.loading-message {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+} 
