@@ -134,8 +134,13 @@
 }
 
 .quiz-item span {
-  color: #fff;
+  color: var(--text-primary);
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70%;
+  position: relative;
 }
 
 .start-quiz-btn {
@@ -146,6 +151,9 @@
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.9rem;
+  min-width: 100px;
+  max-width: 100px;
+  text-align: center;
   transition: all 0.3s ease;
 }
 
@@ -156,6 +164,7 @@
 .no-quizzes {
   text-align: center;
   padding: 3rem;
+  color: black;
   background: #f7fafc;
   border-radius: 8px;
   grid-column: 1 / -1;
