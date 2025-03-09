@@ -87,10 +87,16 @@ const QuizzesComponent = ({ selectedDocument }) => {
     }
   };
 
-  const handleSelectAnswer = (questionId, answerId) => {
+  const handleSelectAnswer = (questionId, answerId) => {                      //edited
+    const currentQuestion = selectedQuiz.questions[currentQuestionIndex];
+    const selectedAnswer = currentQuestion.answers.find(answer => answer.id === answerId);
+    
     setUserAnswers({
       ...userAnswers,
-      [questionId]: answerId
+      [questionId]: {
+        answerId: answerId,
+        isCorrect: selectedAnswer.is_correct
+      }
     });
   };
 
@@ -130,8 +136,15 @@ const QuizzesComponent = ({ selectedDocument }) => {
               {currentQuestion.answers.map((answer) => (
                 <button 
                   key={answer.id} 
-                  className={`option-btn ${userAnswers[currentQuestion.id] === answer.id ? 'selected' : ''}`}
+                  className={`option-btn ${
+                    userAnswers[currentQuestion.id]?.answerId === answer.id 
+                      ? userAnswers[currentQuestion.id].isCorrect 
+                        ? 'correct'
+                        : 'incorrect'
+                      : ''
+                  } ${userAnswers[currentQuestion.id]?.answerId === answer.id ? 'selected' : ''}`}
                   onClick={() => handleSelectAnswer(currentQuestion.id, answer.id)}
+                  disabled={userAnswers[currentQuestion.id]}
                 >
                   {answer.answer_text}
                 </button>

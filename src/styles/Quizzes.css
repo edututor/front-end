@@ -210,8 +210,20 @@
 }
 
 .option-btn.correct {
-  border-color: #10B981;
-  background: rgba(16, 185, 129, 0.1);
+  background-color: #4caf50 !important; /* Green */
+  color: white;
+  border-color: #45a049;
+}
+
+.option-btn.incorrect {
+  background-color: #f44336 !important; /* Red */
+  color: white;
+  border-color: #da190b;
+}
+
+.option-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
 }
 
 .quiz-controls {
