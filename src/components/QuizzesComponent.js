@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import '../styles/Quizzes.css';
 
-const REACT_APP_FETCH_QUIZZES_URL = process.env.REACT_APP_REACT_APP_FETCH_QUIZZES_URL;
+const REACT_APP_FETCH_QUIZZES_URL = process.env.REACT_APP_FETCH_QUIZZES_URL;
 
 const QuizzesComponent = ({ selectedDocument }) => {
   const [quizzes, setQuizzes] = useState([]);
