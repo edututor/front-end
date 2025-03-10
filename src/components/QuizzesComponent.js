@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import '../styles/Quizzes.css';
 
 const FETCH_QUIZZES_URL = process.env.REACT_APP_FETCH_QUIZZES_URL;
