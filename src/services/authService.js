@@ -1,9 +1,9 @@
 import axios from '../utils/axiosInstance';
 
-const USER_AUTH_URL = `${process.env.USER_AUTH_URL}/auth`;
+const REACT_APP_USER_AUTH_URL = `${process.env.REACT_APP_USER_AUTH_URL}/auth`;
 
 const login = async (email, password) => {
-  const response = await axios.post(`${USER_AUTH_URL}/login`, { email, password });
+  const response = await axios.post(`${REACT_APP_USER_AUTH_URL}/login`, { email, password });
   if (response.data.token) {
     localStorage.setItem('user', JSON.stringify(response.data));
   }
@@ -11,7 +11,8 @@ const login = async (email, password) => {
 };
 
 const signup = async (first_name, last_name, email, password) => {
-  return await axios.post(`${USER_AUTH_URL}/signup`, { first_name, last_name, email, password });
+  console.log(`Sending the request to signup to: ${REACT_APP_USER_AUTH_URL}/signup`)
+  return await axios.post(`${REACT_APP_USER_AUTH_URL}/signup`, { first_name, last_name, email, password });
 };
 
 const logout = () => {
