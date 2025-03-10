@@ -23,7 +23,7 @@ const QuizzesComponent = ({ selectedDocument }) => {
     setSelectedQuiz(null);
     setUserAnswers({});
     setCurrentQuestionIndex(0);
-  }, [selectedDocument]);
+  }, [selectedDocument, fetchQuizzes]);
 
   // Fetch all quizzes from the API
   const fetchQuizzes = async () => {
