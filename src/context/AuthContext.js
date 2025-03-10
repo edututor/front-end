@@ -7,16 +7,15 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const storedUser = authService.getCurrentUser();
-      if (storedUser) setUser(storedUser);
-    };
-    fetchUser();
+    const storedData = authService.getCurrentUser();
+    if (storedData && storedData.user) {  // Ensure it has a user
+      setUser(storedData.user);
+    }
   }, []);
 
   const login = async (email, password) => {
     const userData = await authService.login(email, password);
-    setUser(userData);
+    setUser(userData.user);
   };
 
   const logout = () => {
