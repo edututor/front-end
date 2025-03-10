@@ -12,21 +12,8 @@ const QuizzesComponent = ({ selectedDocument }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch all quizzes when component mounts or document changes
-  useEffect(() => {
-    if (selectedDocument) {
-      fetchQuizzes();
-    } else {
-      setQuizzes([]);
-    }
-    // Reset state when selected document changes
-    setSelectedQuiz(null);
-    setUserAnswers({});
-    setCurrentQuestionIndex(0);
-  }, [selectedDocument, fetchQuizzes]);
-
   // Fetch all quizzes from the API
-  const fetchQuizzes = async () => {
+  const fetchQuizzes = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -48,7 +35,21 @@ const QuizzesComponent = ({ selectedDocument }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedDocument]);
+
+  // Fetch all quizzes when component mounts or document changes
+  useEffect(() => {
+    if (selectedDocument) {
+      fetchQuizzes();
+    } else {
+      setQuizzes([]);
+    }
+    // Reset state when selected document changes
+    setSelectedQuiz(null);
+    setUserAnswers({});
+    setCurrentQuestionIndex(0);
+  }, [selectedDocument, fetchQuizzes]);
+
 
   const handleStartQuiz = async (quizId) => {
     setIsLoading(true);
