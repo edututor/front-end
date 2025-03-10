@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import '../styles/Quizzes.css';
 
-const FETCH_QUIZZES_URL = process.env.REACT_APP_FETCH_QUIZZES_URL;
+const REACT_APP_FETCH_QUIZZES_URL = process.env.REACT_APP_REACT_APP_FETCH_QUIZZES_URL;
 
 const QuizzesComponent = ({ selectedDocument }) => {
   const [quizzes, setQuizzes] = useState([]);
@@ -17,7 +17,7 @@ const QuizzesComponent = ({ selectedDocument }) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${FETCH_QUIZZES_URL}/api/get-all-quizzes`);
+      const response = await fetch(`${REACT_APP_FETCH_QUIZZES_URL}/api/get-all-quizzes`);
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
@@ -55,7 +55,7 @@ const QuizzesComponent = ({ selectedDocument }) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${FETCH_QUIZZES_URL}/api/get-selected-quiz/${quizId}`);
+      const response = await fetch(`${REACT_APP_FETCH_QUIZZES_URL}/api/get-selected-quiz/${quizId}`);
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }

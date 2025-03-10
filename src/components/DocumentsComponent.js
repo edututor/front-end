@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../styles/Documents.css';
 
 
-const FETCH_DOCUMENTS_URL = process.env.FETCH_DOCUMENTS_URL;
+const REACT_APP_FETCH_DOCUMENTS_URL = process.env.REACT_APP_FETCH_DOCUMENTS_URL;
 
 const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUploaded }) => {
   const [documents, setDocuments] = useState([]);
@@ -15,7 +15,7 @@ const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUpl
       setError(null);
       try {
 
-        const response = await fetch(`${FETCH_DOCUMENTS_URL}/api/documents`);
+        const response = await fetch(`${REACT_APP_FETCH_DOCUMENTS_URL}/api/documents`);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
