@@ -56,7 +56,7 @@ const Signup = () => {
           <button type="submit" className="auth-button">Signup</button>
         </form>
         <p className="auth-link">
-          Already have an account? <a onClick={() => navigate("/login")}>Login</a>
+          Already have an account? <button onClick={() => navigate("/login")} className="link-button">Login</button>
         </p>
       </div>
     </div>
