@@ -12,7 +12,6 @@ const login = async (email, password) => {
 };
 
 const signup = async (first_name, last_name, email, password) => {
-  console.log(`Sending the request to signup to: ${REACT_APP_USER_AUTH_URL}/signup`)
   return await axios.post(`${REACT_APP_USER_AUTH_URL}/signup`, { first_name, last_name, email, password });
 };
 
