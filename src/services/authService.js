@@ -4,8 +4,9 @@ const REACT_APP_USER_AUTH_URL = `${process.env.REACT_APP_USER_AUTH_URL}/auth`;
 
 const login = async (email, password) => {
   const response = await axios.post(`${REACT_APP_USER_AUTH_URL}/login`, { email, password });
-  if (response.data.token) {
-    localStorage.setItem('user', JSON.stringify(response.data));
+
+  if (response.data.access_token) {
+    localStorage.setItem('user', JSON.stringify(response.data)); // Save { user, access_token, token_type }
   }
   return response.data;
 };
