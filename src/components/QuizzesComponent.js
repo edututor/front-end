@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import '../styles/Quizzes.css';
 
-
-const API_URL = 'http://127.0.0.1:8001';
+const REACT_APP_FETCH_QUIZZES_URL = process.env.REACT_APP_FETCH_QUIZZES_URL;
 
 const QuizzesComponent = ({ selectedDocument }) => {
   const [quizzes, setQuizzes] = useState([]);
@@ -13,25 +12,12 @@ const QuizzesComponent = ({ selectedDocument }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch all quizzes when component mounts or document changes
-  useEffect(() => {
-    if (selectedDocument) {
-      fetchQuizzes();
-    } else {
-      setQuizzes([]);
-    }
-    // Reset state when selected document changes
-    setSelectedQuiz(null);
-    setUserAnswers({});
-    setCurrentQuestionIndex(0);
-  }, [selectedDocument]);
-
   // Fetch all quizzes from the API
-  const fetchQuizzes = async () => {
+  const fetchQuizzes = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/api/get-all-quizzes`);
+      const response = await fetch(`${REACT_APP_FETCH_QUIZZES_URL}/api/get-all-quizzes`);
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
@@ -49,13 +35,27 @@ const QuizzesComponent = ({ selectedDocument }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedDocument]);
+
+  // Fetch all quizzes when component mounts or document changes
+  useEffect(() => {
+    if (selectedDocument) {
+      fetchQuizzes();
+    } else {
+      setQuizzes([]);
+    }
+    // Reset state when selected document changes
+    setSelectedQuiz(null);
+    setUserAnswers({});
+    setCurrentQuestionIndex(0);
+  }, [selectedDocument, fetchQuizzes]);
+
 
   const handleStartQuiz = async (quizId) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/api/get-selected-quiz/${quizId}`);
+      const response = await fetch(`${REACT_APP_FETCH_QUIZZES_URL}/api/get-selected-quiz/${quizId}`);
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
@@ -95,7 +95,7 @@ const QuizzesComponent = ({ selectedDocument }) => {
       ...userAnswers,
       [questionId]: {
         answerId: answerId,
-        isCorrect: selectedAnswer.is_correct
+        isCorrect: selectedAnswer.is_correct_answer
       }
     });
   };

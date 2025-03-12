@@ -22,15 +22,16 @@ const App = () => {
         <div className={`app ${isDarkMode ? 'dark' : 'light'}`}>
           <Navbar toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<PrivateRoute />}>
+              <Route index element={<Home />} />
+            </Route>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
           </Routes>
         </div>
       </Router>
     </AuthProvider>
-    
   );
-};
+}  
 
 export default App;

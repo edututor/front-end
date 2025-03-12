@@ -1,20 +1,19 @@
-import React, { useState} from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import authService from '../services/authService';
+import { AuthContext } from '../context/AuthContext';
 import "../styles/Auth.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await authService.login(email, password);
-      localStorage.setItem("token", response.access_token);  // Save token
-      navigate("/");
-      window.location.reload();
+      await login(email, password);
+      navigate("/");  // Redirect to home after successful login
     } catch (error) {
       alert("Login failed");
     }
@@ -42,7 +41,10 @@ const Login = () => {
           <button type="submit" className="auth-button">Login</button>
         </form>
         <p className="auth-link">
-          Don't have an account? <a onClick={() => navigate("/signup")}>Sign up</a>
+          Don't have an account?{" "}
+          <button onClick={() => navigate("/signup")} className="link-button">
+            Sign up
+          </button>
         </p>
       </div>
     </div>
