@@ -95,7 +95,7 @@ const QuizzesComponent = ({ selectedDocument }) => {
       ...userAnswers,
       [questionId]: {
         answerId: answerId,
-        isCorrect: selectedAnswer.is_correct
+        isCorrect: selectedAnswer.is_correct_answer
       }
     });
   };
