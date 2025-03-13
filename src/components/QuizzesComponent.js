@@ -134,9 +134,11 @@ const QuizzesComponent = ({ selectedDocument }) => {
                   key={answer.id} 
                   className={`option-btn ${
                     userAnswers[currentQuestion.id]?.answerId === answer.id 
-                      ? answer.is_correct ? 'correct' : 'incorrect'
+                      ? userAnswers[currentQuestion.id].isCorrect 
+                        ? 'correct'
+                        : 'incorrect'
                       : ''
-                  }`}
+                  } ${userAnswers[currentQuestion.id]?.answerId === answer.id ? 'selected' : ''}`}
                   onClick={() => handleSelectAnswer(currentQuestion.id, answer.id)}
                   disabled={userAnswers[currentQuestion.id]}
                 >
