@@ -5,12 +5,12 @@ const REACT_APP_FETCH_QUIZZES_URL = process.env.REACT_APP_FETCH_QUIZZES_URL;
 
 const QuizzesComponent = ({ selectedDocument }) => {
   const [quizzes, setQuizzes] = useState([]);
-
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [hoveredQuizId, setHoveredQuizId] = useState(null);
 
   // Fetch all quizzes from the API
   const fetchQuizzes = useCallback(async () => {
@@ -50,7 +50,6 @@ const QuizzesComponent = ({ selectedDocument }) => {
     setCurrentQuestionIndex(0);
   }, [selectedDocument, fetchQuizzes]);
 
-
   const handleStartQuiz = async (quizId) => {
     setIsLoading(true);
     setError(null);
@@ -87,7 +86,7 @@ const QuizzesComponent = ({ selectedDocument }) => {
     }
   };
 
-  const handleSelectAnswer = (questionId, answerId) => {                      //edited
+  const handleSelectAnswer = (questionId, answerId) => {
     const currentQuestion = selectedQuiz.questions[currentQuestionIndex];
     const selectedAnswer = currentQuestion.answers.find(answer => answer.id === answerId);
     
@@ -100,13 +99,10 @@ const QuizzesComponent = ({ selectedDocument }) => {
     });
   };
 
-
   if (!selectedDocument) {
     return null;
   }
 
-
-  // Render the quiz content when a quiz is selected
   if (selectedQuiz) {
     const currentQuestion = selectedQuiz.questions[currentQuestionIndex];
     return (
@@ -138,11 +134,9 @@ const QuizzesComponent = ({ selectedDocument }) => {
                   key={answer.id} 
                   className={`option-btn ${
                     userAnswers[currentQuestion.id]?.answerId === answer.id 
-                      ? userAnswers[currentQuestion.id].isCorrect 
-                        ? 'correct'
-                        : 'incorrect'
+                      ? answer.is_correct ? 'correct' : 'incorrect'
                       : ''
-                  } ${userAnswers[currentQuestion.id]?.answerId === answer.id ? 'selected' : ''}`}
+                  }`}
                   onClick={() => handleSelectAnswer(currentQuestion.id, answer.id)}
                   disabled={userAnswers[currentQuestion.id]}
                 >
@@ -175,18 +169,16 @@ const QuizzesComponent = ({ selectedDocument }) => {
             </button>
           </div>
         </div>
-
       </div>
     );
   }
 
-  // Show error message if there's an error
+ 
 
   if (error) {
     return (
       <div className="quizzes-section">
         <h2>Available Quizzes</h2>
-
         <div className="error-message">
           <p>{error}</p>
           <button className="quiz-btn" onClick={fetchQuizzes}>
@@ -197,7 +189,6 @@ const QuizzesComponent = ({ selectedDocument }) => {
     );
   }
 
-  // Render the list of quizzes when no quiz is selected
   return (
     <div className="quizzes-section">
       <h2>Available Quizzes</h2>
@@ -209,8 +200,16 @@ const QuizzesComponent = ({ selectedDocument }) => {
       ) : quizzes.length > 0 ? (
         <div className="quizzes-list">
           {quizzes.map((quiz) => (
-            <div key={quiz.id} className="quiz-item">
+            <div 
+              key={quiz.id} 
+              className="quiz-item"
+              onMouseEnter={() => setHoveredQuizId(quiz.id)}
+              onMouseLeave={() => setHoveredQuizId(null)}
+            >
               <span>{quiz.title}</span>
+              {hoveredQuizId === quiz.id && (
+                <div className="tooltip">{quiz.title}</div>
+              )}
               <button 
                 className="start-quiz-btn"
                 onClick={() => handleStartQuiz(quiz.id)}
