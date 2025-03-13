@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Documents.css';
 
+
 const REACT_APP_FETCH_DOCUMENTS_URL = process.env.REACT_APP_FETCH_DOCUMENTS_URL;
 
 const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUploaded }) => {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [hoveredDocId, setHoveredDocId] = useState(null);
 
   useEffect(() => {
     const fetchDocuments = async () => {
       setLoading(true);
       setError(null);
       try {
+
         const response = await fetch(`${REACT_APP_FETCH_DOCUMENTS_URL}/api/documents`);
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -29,7 +31,7 @@ const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUpl
     };
 
     fetchDocuments();
-  }, [newDocumentUploaded]);
+  }, [newDocumentUploaded]); // Re-fetch when newDocumentUploaded changes
 
   useEffect(() => {
     if (newDocumentUploaded && documents.length > 0) {
@@ -59,13 +61,8 @@ const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUpl
             onClick={() => {
               onSelectDocument(doc);
             }}
-            onMouseEnter={() => setHoveredDocId(doc.id)}
-            onMouseLeave={() => setHoveredDocId(null)}
           >
             <span>{doc.name}</span>
-            {hoveredDocId === doc.id && (
-              <div className="tooltip">{doc.name}</div>
-            )}
             <button
               className={`view-doc-btn ${selectedDocument?.id === doc.id ? 'selected' : ''}`}
             >
