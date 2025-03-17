@@ -11,6 +11,7 @@ const QuizzesComponent = ({ selectedDocument }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [hoveredQuizId, setHoveredQuizId] = useState(null);
+  const [showResults, setShowResults] = useState(false);
 
   // Fetch all quizzes from the API
   const fetchQuizzes = useCallback(async () => {
@@ -48,6 +49,7 @@ const QuizzesComponent = ({ selectedDocument }) => {
     setSelectedQuiz(null);
     setUserAnswers({});
     setCurrentQuestionIndex(0);
+    setShowResults(false);
   }, [selectedDocument, fetchQuizzes]);
 
   const handleStartQuiz = async (quizId) => {
@@ -60,6 +62,7 @@ const QuizzesComponent = ({ selectedDocument }) => {
       }
       const quizData = await response.json();
       setSelectedQuiz(quizData);
+      setShowResults(false);
     } catch (error) {
       console.error("Error fetching quiz:", error);
       setError("Failed to load quiz. Please try again later.");
@@ -72,6 +75,7 @@ const QuizzesComponent = ({ selectedDocument }) => {
     setSelectedQuiz(null);
     setUserAnswers({});
     setCurrentQuestionIndex(0);
+    setShowResults(false);
   };
 
   const handleNextQuestion = () => {
@@ -99,6 +103,10 @@ const QuizzesComponent = ({ selectedDocument }) => {
     });
   };
 
+  const handleEndQuiz = () => {
+    setShowResults(true);
+  };
+
   if (!selectedDocument) {
     return null;
   }
@@ -110,9 +118,14 @@ const QuizzesComponent = ({ selectedDocument }) => {
         <div className="quiz-active">
           <div className="quiz-header">
             <h2>{selectedQuiz.title}</h2>
-            <button className="quiz-btn" onClick={handleCloseQuiz}>
-              Close Quiz
-            </button>
+            <div className="quiz-header-buttons">
+              <button className="end-quiz-btn" onClick={handleEndQuiz}>
+                End Quiz
+              </button>
+              <button className="quiz-btn" onClick={handleCloseQuiz}>
+                Close Quiz
+              </button>
+            </div>
           </div>
 
           <div className="quiz-progress">
@@ -175,7 +188,47 @@ const QuizzesComponent = ({ selectedDocument }) => {
     );
   }
 
- 
+  // results view
+  if (selectedQuiz && showResults) {
+    // Count correct answers
+    let correctCount = 0;
+    let totalAnswered = 0;
+    
+    selectedQuiz.questions.forEach(question => {
+      if (userAnswers[question.id]) {
+        totalAnswered++;
+        if (userAnswers[question.id].isCorrect) {
+          correctCount++;
+        }
+      }
+    });
+    
+    const totalQuestions = selectedQuiz.questions.length;
+    const score = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+    
+    return (
+      <div className="quizzes-section">
+        <div className="quiz-active results-view">
+          <div className="quiz-header">
+            <h2>Quiz Results</h2>
+            <button className="quiz-btn" onClick={handleCloseQuiz}>
+              Close
+            </button>
+          </div>
+          
+          <div className="results-content">
+            <h3>Your Score: {score}%</h3>
+            <p>You answered {correctCount} out of {totalQuestions} questions correctly.</p>
+            <p>Questions attempted: {totalAnswered} of {totalQuestions}</p>
+            
+            <button className="quiz-btn" onClick={handleCloseQuiz}>
+              Back to Quizzes
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     return (
