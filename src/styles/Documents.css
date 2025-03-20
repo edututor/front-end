@@ -1,22 +1,55 @@
-.documents-container {
-  flex: 1;
-  border: 3px solid #283c5f;
-  margin-bottom: 10px;
+/* Documents.css */
+.documents-section {
+  background: var(--bg-secondary);
+  border-radius: 15px;
   padding: 20px;
-  border-radius: 20px;
-  background-color: white;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
 }
 
-.documents-container h2 {
-  color: #283c5f;
-  margin-bottom: 20px;
+.documents-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.documents-header h2 {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.upload-button-container {
+  display: flex;
+  align-items: center;
+}
+
+.floating-upload-btn {
+  width: 32px;
+  height: 32px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 50%;
   font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+  padding: 0;
+}
+
+.floating-upload-btn:hover {
+  background-color: #1d4ed8;
+  transform: scale(1.05);
 }
 
 .documents-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -51,9 +84,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 70%; /* Adjust to prevent overlap */
+  max-width: 70%;
 }
-
 
 .view-doc-btn {
   padding: 8px 12px;
@@ -77,23 +109,7 @@
   background: var(--accent-hover);
 }
 
-.documents-section {
-  background: var(--bg-secondary);
-  border-radius: 15px;
-  padding: 20px;
-  margin-bottom: 20px;
-  border: 1px solid var(--border-color);
-}
-
-.documents-section h2 {
-  color: var(--text-primary);
-  font-size: 1.25rem;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.loading {
+.loading-message {
   text-align: center;
   color: var(--text-secondary);
   padding: 20px;
@@ -117,35 +133,6 @@
   border: 1px dashed var(--border-color);
 }
 
-.file-upload-container {
-  margin-top: 20px;
-}
-
-.file-upload-input {
-  display: none;
-}
-
-.file-upload-label {
-  display: inline-block;
-  padding: 12px 20px;
-  background-color: #f7941d;
-  color: white;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.file-upload-label:hover {
-  background-color: #e68a1c;
-}
-
-.loading-message {
-  text-align: center;
-  color: #666;
-  padding: 20px;
-} 
-
-/* Documents.css */
 .tooltip {
   position: absolute;
   background-color: #333;
@@ -158,4 +145,38 @@
   top: -30px;
   left: 50%;
   transform: translateX(-50%);
+}
+
+.upload-progress {
+  margin: 15px 0;
+  padding: 10px;
+  background: var(--input-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.progress-bar {
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent-color);
+  transition: width 0.3s ease;
+}
+
+.upload-progress p {
+  text-align: center;
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.dragging {
+  border: 2px dashed var(--accent-color);
+  background-color: rgba(37, 99, 235, 0.05);
 }
