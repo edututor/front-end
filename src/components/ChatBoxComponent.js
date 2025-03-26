@@ -1,13 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/ChatBox.css';
 
-const ChatBoxComponent = ({ selectedDocument, onDocumentUpload }) => {
+const ChatBoxComponent = ({ selectedDocument }) => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef(null);
 
   useEffect(() => {
     // Clear chat when document changes
@@ -20,7 +16,7 @@ const ChatBoxComponent = ({ selectedDocument, onDocumentUpload }) => {
     } else {
       setMessages([{
         type: 'ai',
-        content: 'Please select an existing document or upload a new one to start chatting.'
+        content: 'Please select a document to start chatting.'
       }]);
     }
   }, [selectedDocument]);
@@ -31,7 +27,7 @@ const ChatBoxComponent = ({ selectedDocument, onDocumentUpload }) => {
     if (!selectedDocument) {
       setMessages(prev => [...prev, {
         type: 'ai',
-        content: 'Please select or upload a document first.'
+        content: 'Please select a document first.'
       }]);
       return;
     }
@@ -61,59 +57,8 @@ const ChatBoxComponent = ({ selectedDocument, onDocumentUpload }) => {
     }
   };
 
-  const handleFileUpload = async (file) => {
-    setIsUploading(true);
-    try {
-      await onDocumentUpload(file, (progress) => {
-        setUploadProgress(progress);
-      });
-      setMessages(prev => [...prev, {
-        type: 'ai',
-        content: 'Document uploaded successfully! You can now start chatting.'
-      }]);
-    } catch (error) {
-      setMessages(prev => [...prev, {
-        type: 'ai',
-        content: 'Failed to upload document. Please try again.'
-      }]);
-    }
-    setIsUploading(false);
-    setUploadProgress(0);
-  };
-
-  const handleDrop = async (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      await handleFileUpload(file);
-    }
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleFileInputChange = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      await handleFileUpload(file);
-    }
-  };
-
   return (
-    <div 
-      className={`chat-box-wrapper ${isDragging ? 'dragging' : ''} ${!selectedDocument ? 'no-document' : ''}`}
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-    >
+    <div className={`chat-box-wrapper ${!selectedDocument ? 'no-document' : ''}`}>
       <div className="chat-header">
         <h2>Chat Box</h2>
         {selectedDocument && (
@@ -124,27 +69,9 @@ const ChatBoxComponent = ({ selectedDocument, onDocumentUpload }) => {
       </div>
 
       <div className="chat-messages">
-        {!selectedDocument && !isUploading && (
+        {!selectedDocument && (
           <div className="upload-prompt">
-            <p>To get started:</p>
-            <ul>
-              <li>Drag and drop a document here</li>
-              <li>Or click below to upload</li>
-              <li>Or select an existing document from the sidebar</li>
-            </ul>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileInputChange}
-              style={{ display: 'none' }}
-              accept=".pdf,.doc,.docx,.txt"
-            />
-            <button 
-              className="upload-btn"
-              onClick={() => fileInputRef.current.click()}
-            >
-              Upload Document
-            </button>
+            <p>Please select a document from the sidebar to start chatting.</p>
           </div>
         )}
         
@@ -153,18 +80,6 @@ const ChatBoxComponent = ({ selectedDocument, onDocumentUpload }) => {
             {message.content}
           </div>
         ))}
-        
-        {isUploading && (
-          <div className="upload-progress">
-            <div className="progress-bar">
-              <div 
-                className="progress-fill"
-                style={{ width: `${uploadProgress}%` }}
-              ></div>
-            </div>
-            <p>Uploading: {uploadProgress}%</p>
-          </div>
-        )}
       </div>
 
       <div className="chat-input-container">
@@ -172,7 +87,7 @@ const ChatBoxComponent = ({ selectedDocument, onDocumentUpload }) => {
           type="text"
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
-          placeholder={selectedDocument ? "Type your message here..." : "Select or upload a document to start chatting"}
+          placeholder={selectedDocument ? "Type your message here..." : "Select a document to start chatting"}
           className="chat-input"
           disabled={!selectedDocument}
         />
