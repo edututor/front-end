@@ -19,6 +19,7 @@
 .documents-header h2 {
   color: var(--text-primary);
   font-size: 1.25rem;
+  border-bottom: none;
   margin: 0;
 }
 
