@@ -51,6 +51,11 @@ const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUpl
     setError(null);
     
     try {
+      // Validate file type
+      if (!file.type || file.type !== 'application/pdf') {
+        throw new Error('Only PDF files are allowed');
+      }
+
       const formData = new FormData();
       formData.append('file', file);
 
@@ -117,22 +122,6 @@ const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUpl
     }
   };
 
-  const handleFileInputChange = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      await handleFileUpload(file);
-    }
-  };
-
-  const handleDrop = async (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      await handleFileUpload(file);
-    }
-  };
-
   const handleDragOver = (e) => {
     e.preventDefault();
     setIsDragging(true);
@@ -141,6 +130,15 @@ const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUpl
   const handleDragLeave = (e) => {
     e.preventDefault();
     setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFileUpload(file);
+    }
   };
 
   // Render loading state
@@ -173,9 +171,14 @@ const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUpl
           <input
             type="file"
             ref={fileInputRef}
-            onChange={handleFileInputChange}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                handleFileUpload(file);
+              }
+            }}
+            accept=".pdf"
             style={{ display: 'none' }}
-            accept=".pdf,.doc,.docx,.txt"
           />
         </div>
       </div>
