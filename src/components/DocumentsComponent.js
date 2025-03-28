@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../styles/Documents.css';
 
 const REACT_APP_FETCH_DOCUMENTS_URL = process.env.REACT_APP_FETCH_DOCUMENTS_URL;
+const REACT_APP_PDF_UPLOAD_URL = process.env.REACT_APP_PDF_UPLOAD_URL;
 
 const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUploaded, onDocumentUpload }) => {
   const [documents, setDocuments] = useState([]);
@@ -47,17 +48,72 @@ const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUpl
   const handleFileUpload = async (file) => {
     setIsUploading(true);
     setUploadProgress(0);
+    setError(null);
     
     try {
-      await onDocumentUpload(file, (progress) => {
-        setUploadProgress(progress);
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 300);
+
+      const response = await fetch(`${REACT_APP_PDF_UPLOAD_URL}/api/upload`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json',
+        }
       });
+
+      clearInterval(progressInterval);
+
+      // Handle different response statuses
+      if (response.status === 409) {
+        const data = await response.json();
+        setUploadProgress(100);
+        const newDocument = {
+          id: Date.now(),
+          name: file.name,
+          url: data.file_url
+        };
+        setDocuments(prevDocs => [...prevDocs, newDocument]);
+        onSelectDocument(newDocument);
+        return;
+      } else if (response.status === 400) {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      } else if (response.status === 500) {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      } else if (response.status === 200) {
+        const uploadResponse = await response.json();
+        setUploadProgress(100);
+        
+        const newDocument = {
+          id: Date.now(),
+          name: file.name,
+          url: uploadResponse.file_url
+        };
+        
+        setDocuments(prevDocs => [...prevDocs, newDocument]);
+        onSelectDocument(newDocument);
+      } else {
+        throw new Error('Upload failed with unexpected status');
+      }
+      
     } catch (error) {
       console.error("Failed to upload document:", error);
-      setError(new Error("Failed to upload document. Please try again."));
+      setError(error);
     } finally {
       setIsUploading(false);
-      setUploadProgress(0);
+      setTimeout(() => setUploadProgress(0), 500);
     }
   };
 
