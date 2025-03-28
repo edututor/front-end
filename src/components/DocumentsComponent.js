@@ -107,8 +107,16 @@ const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUpl
           url: uploadResponse.file_url
         };
         
+        // Update documents list and trigger refresh
         setDocuments(prevDocs => [...prevDocs, newDocument]);
         onSelectDocument(newDocument);
+        
+        // Trigger document list refresh
+        const response = await fetch(`${REACT_APP_FETCH_DOCUMENTS_URL}/api/documents`);
+        if (response.ok) {
+          const data = await response.json();
+          setDocuments(data.list_of_names.map((name, index) => ({ id: index + 1, name: name })));
+        }
       } else {
         throw new Error('Upload failed with unexpected status');
       }
@@ -142,92 +150,78 @@ const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUpl
   };
 
   // Render loading state
-  if (loading && !isUploading) {
-    return <div className="documents-section loading-message">Loading documents...</div>;
+  if (loading) {
+    return <div className="documents-loading">Loading documents...</div>;
   }
 
   // Render error state
-  if (error && !isUploading) {
-    return <div className="documents-section error-message">Error: {error.message}</div>;
+  if (error) {
+    return <div className="documents-error">Error: {error.message}</div>;
   }
 
   return (
     <div 
-      className={`documents-section ${isDragging ? 'dragging' : ''}`}
-      onDrop={handleDrop}
+      className="documents-container"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
     >
       <div className="documents-header">
         <h2>Documents</h2>
-        <div className="upload-button-container">
-          <button 
-            className="floating-upload-btn"
-            onClick={() => fileInputRef.current.click()}
-            title="Upload Document"
-          >
-            +
-          </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                handleFileUpload(file);
-              }
-            }}
-            accept=".pdf"
-            style={{ display: 'none' }}
-          />
-        </div>
+        <button 
+          className="upload-button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+        >
+          {isUploading ? 'Uploading...' : 'Upload PDF'}
+        </button>
       </div>
       
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            handleFileUpload(file);
+          }
+        }}
+        accept=".pdf"
+        style={{ display: 'none' }}
+      />
+
       {isUploading && (
         <div className="upload-progress">
-          <div className="progress-bar">
-            <div 
-              className="progress-fill"
-              style={{ width: `${uploadProgress}%` }}
-            ></div>
-          </div>
-          <p>Uploading: {uploadProgress}%</p>
+          <div 
+            className="progress-bar"
+            style={{ width: `${uploadProgress}%` }}
+          />
+          <span>{uploadProgress}%</span>
         </div>
       )}
 
-      {documents.length === 0 && !loading && !isUploading ? (
-        <div className="no-documents">
-          <p>No documents available. Upload a document to get started:</p>
-          <ul>
-            <li>Drag and drop a document here</li>
-            <li>Or click the + button to upload</li>
-          </ul>
-        </div>
-      ) : (
-        <div className="documents-list">
-          {documents.map((doc) => (
+      <div className={`documents-list ${isDragging ? 'dragging' : ''}`}>
+        {documents.length === 0 ? (
+          <div className="no-documents">No documents uploaded yet</div>
+        ) : (
+          documents.map((doc) => (
             <div
               key={doc.id}
-              className={`document-item ${selectedDocument?.id === doc.id ? 'selected' : ''}`}
-              onClick={() => {
-                onSelectDocument(doc);
-              }}
+              className="document-item"
               onMouseEnter={() => setHoveredDocId(doc.id)}
               onMouseLeave={() => setHoveredDocId(null)}
             >
-              <span>{doc.name}</span>
-              {hoveredDocId === doc.id && (
-                <div className="tooltip">{doc.name}</div>
-              )}
+              <span className="document-name">{doc.name}</span>
               <button
-                className={`view-doc-btn ${selectedDocument?.id === doc.id ? 'selected' : ''}`}
+                className={`select-button ${selectedDocument?.id === doc.id ? 'selected' : ''}`}
+                onClick={() => onSelectDocument(doc)}
               >
                 {selectedDocument?.id === doc.id ? 'Selected' : 'Select'}
               </button>
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 };
