@@ -270,7 +270,8 @@ const QuizzesComponent = ({ selectedDocument }) => {
                 onClick={() => handleStartQuiz(quiz.id)}
               >
                 Start Quiz
-              </button>
+                </button>
+              
             </div>
           ))}
         </div>
