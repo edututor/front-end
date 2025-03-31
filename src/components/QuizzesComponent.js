@@ -110,6 +110,48 @@ const QuizzesComponent = ({ selectedDocument }) => {
   if (!selectedDocument) {
     return null;
   }
+  
+  // results view
+  if (selectedQuiz && showResults) {
+    // Count correct answers
+    let correctCount = 0;
+    let totalAnswered = 0;
+    
+    selectedQuiz.questions.forEach(question => {
+      if (userAnswers[question.id]) {
+        totalAnswered++;
+        if (userAnswers[question.id].isCorrect) {
+          correctCount++;
+        }
+      }
+    });
+    
+    const totalQuestions = selectedQuiz.questions.length;
+    const score = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+    
+    return (
+      <div className="quizzes-section">
+        <div className="quiz-active results-view">
+          <div className="quiz-header">
+            <h2>Quiz Results</h2>
+            <button className="quiz-btn" onClick={handleCloseQuiz}>
+              Close
+            </button>
+          </div>
+          
+          <div className="results-content">
+            <h3>Your Score: {score}%</h3>
+            <p>You answered {correctCount} out of {totalQuestions} questions correctly.</p>
+            <p>Questions attempted: {totalAnswered} of {totalQuestions}</p>
+            
+            <button className="quiz-btn" onClick={handleCloseQuiz}>
+              Back to Quizzes
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (selectedQuiz) {
     const currentQuestion = selectedQuiz.questions[currentQuestionIndex];
@@ -181,48 +223,6 @@ const QuizzesComponent = ({ selectedDocument }) => {
               disabled={currentQuestionIndex === selectedQuiz.questions.length - 1}
             >
               Next
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // results view
-  if (selectedQuiz && showResults) {
-    // Count correct answers
-    let correctCount = 0;
-    let totalAnswered = 0;
-    
-    selectedQuiz.questions.forEach(question => {
-      if (userAnswers[question.id]) {
-        totalAnswered++;
-        if (userAnswers[question.id].isCorrect) {
-          correctCount++;
-        }
-      }
-    });
-    
-    const totalQuestions = selectedQuiz.questions.length;
-    const score = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
-    
-    return (
-      <div className="quizzes-section">
-        <div className="quiz-active results-view">
-          <div className="quiz-header">
-            <h2>Quiz Results</h2>
-            <button className="quiz-btn" onClick={handleCloseQuiz}>
-              Close
-            </button>
-          </div>
-          
-          <div className="results-content">
-            <h3>Your Score: {score}%</h3>
-            <p>You answered {correctCount} out of {totalQuestions} questions correctly.</p>
-            <p>Questions attempted: {totalAnswered} of {totalQuestions}</p>
-            
-            <button className="quiz-btn" onClick={handleCloseQuiz}>
-              Back to Quizzes
             </button>
           </div>
         </div>

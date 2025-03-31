@@ -238,7 +238,8 @@
 }
 
 .quiz-btn {
-  padding: 8px 16px;
+  padding: 8px 12px;
+  font-size: 0.875rem;
   background: var(--accent-color);
   color: white;
   border: none;
@@ -341,7 +342,14 @@
 }
 
 .end-quiz-btn {
+  padding: 8px 12px;
+  font-size: 0.875rem;
   background-color: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .end-quiz-btn:hover {
