@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import 'EditQuizzes.css';
 
 const QuizEditor = () => {
   const [quizData, setQuizData] = useState({
