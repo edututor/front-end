@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../styles/Documents.css';
 
 const REACT_APP_FETCH_DOCUMENTS_URL = process.env.REACT_APP_FETCH_DOCUMENTS_URL;
-const REACT_APP_PDF_UPLOAD_URL = process.env.REACT_APP_PDF_UPLOAD_URL;
 
 const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUploaded, onDocumentUpload }) => {
   const [documents, setDocuments] = useState([]);
@@ -48,85 +47,33 @@ const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUpl
   const handleFileUpload = async (file) => {
     setIsUploading(true);
     setUploadProgress(0);
-    setError(null);
     
     try {
-      // Validate file type
-      if (!file.type || file.type !== 'application/pdf') {
-        throw new Error('Only PDF files are allowed');
-      }
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 300);
-
-      const response = await fetch(`${REACT_APP_PDF_UPLOAD_URL}/api/upload`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Accept': 'application/json',
-        }
+      await onDocumentUpload(file, (progress) => {
+        setUploadProgress(progress);
       });
-
-      clearInterval(progressInterval);
-
-      // Handle different response statuses
-      if (response.status === 409) {
-        const data = await response.json();
-        setUploadProgress(100);
-        const newDocument = {
-          id: Date.now(),
-          name: file.name,
-          url: data.file_url
-        };
-        setDocuments(prevDocs => [...prevDocs, newDocument]);
-        onSelectDocument(newDocument);
-        return;
-      } else if (response.status === 400) {
-        const errorData = await response.json();
-        throw new Error(errorData.message);
-      } else if (response.status === 500) {
-        const errorData = await response.json();
-        throw new Error(errorData.message);
-      } else if (response.status === 200) {
-        const uploadResponse = await response.json();
-        setUploadProgress(100);
-        
-        const newDocument = {
-          id: Date.now(),
-          name: file.name,
-          url: uploadResponse.file_url
-        };
-        
-        // Update documents list and trigger refresh
-        setDocuments(prevDocs => [...prevDocs, newDocument]);
-        onSelectDocument(newDocument);
-        
-        // Trigger document list refresh
-        const response = await fetch(`${REACT_APP_FETCH_DOCUMENTS_URL}/api/documents`);
-        if (response.ok) {
-          const data = await response.json();
-          setDocuments(data.list_of_names.map((name, index) => ({ id: index + 1, name: name })));
-        }
-      } else {
-        throw new Error('Upload failed with unexpected status');
-      }
-      
     } catch (error) {
       console.error("Failed to upload document:", error);
-      setError(error);
+      setError(new Error("Failed to upload document. Please try again."));
     } finally {
       setIsUploading(false);
-      setTimeout(() => setUploadProgress(0), 500);
+      setUploadProgress(0);
+    }
+  };
+
+  const handleFileInputChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      await handleFileUpload(file);
+    }
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      await handleFileUpload(file);
     }
   };
 
@@ -140,88 +87,88 @@ const DocumentsComponent = ({ onSelectDocument, selectedDocument, newDocumentUpl
     setIsDragging(false);
   };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      handleFileUpload(file);
-    }
-  };
-
   // Render loading state
-  if (loading) {
-    return <div className="documents-loading">Loading documents...</div>;
+  if (loading && !isUploading) {
+    return <div className="documents-section loading-message">Loading documents...</div>;
   }
 
   // Render error state
-  if (error) {
-    return <div className="documents-error">Error: {error.message}</div>;
+  if (error && !isUploading) {
+    return <div className="documents-section error-message">Error: {error.message}</div>;
   }
 
   return (
     <div 
-      className="documents-container"
+      className={`documents-section ${isDragging ? 'dragging' : ''}`}
+      onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
     >
       <div className="documents-header">
         <h2>Documents</h2>
-        <button 
-          className="upload-button"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isUploading}
-        >
-          {isUploading ? 'Uploading...' : 'Upload PDF'}
-        </button>
+        <div className="upload-button-container">
+          <button 
+            className="floating-upload-btn"
+            onClick={() => fileInputRef.current.click()}
+            title="Upload Document"
+          >
+            +
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileInputChange}
+            style={{ display: 'none' }}
+            accept=".pdf,.doc,.docx,.txt"
+          />
+        </div>
       </div>
       
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) {
-            handleFileUpload(file);
-          }
-        }}
-        accept=".pdf"
-        style={{ display: 'none' }}
-      />
-
       {isUploading && (
         <div className="upload-progress">
-          <div 
-            className="progress-bar"
-            style={{ width: `${uploadProgress}%` }}
-          />
-          <span>{uploadProgress}%</span>
+          <div className="progress-bar">
+            <div 
+              className="progress-fill"
+              style={{ width: `${uploadProgress}%` }}
+            ></div>
+          </div>
+          <p>Uploading: {uploadProgress}%</p>
         </div>
       )}
 
-      <div className={`documents-list ${isDragging ? 'dragging' : ''}`}>
-        {documents.length === 0 ? (
-          <div className="no-documents">No documents uploaded yet</div>
-        ) : (
-          documents.map((doc) => (
+      {documents.length === 0 && !loading && !isUploading ? (
+        <div className="no-documents">
+          <p>No documents available. Upload a document to get started:</p>
+          <ul>
+            <li>Drag and drop a document here</li>
+            <li>Or click the + button to upload</li>
+          </ul>
+        </div>
+      ) : (
+        <div className="documents-list">
+          {documents.map((doc) => (
             <div
               key={doc.id}
-              className="document-item"
+              className={`document-item ${selectedDocument?.id === doc.id ? 'selected' : ''}`}
+              onClick={() => {
+                onSelectDocument(doc);
+              }}
               onMouseEnter={() => setHoveredDocId(doc.id)}
               onMouseLeave={() => setHoveredDocId(null)}
             >
-              <span className="document-name">{doc.name}</span>
+              <span>{doc.name}</span>
+              {hoveredDocId === doc.id && (
+                <div className="tooltip">{doc.name}</div>
+              )}
               <button
-                className={`select-button ${selectedDocument?.id === doc.id ? 'selected' : ''}`}
-                onClick={() => onSelectDocument(doc)}
+                className={`view-doc-btn ${selectedDocument?.id === doc.id ? 'selected' : ''}`}
               >
                 {selectedDocument?.id === doc.id ? 'Selected' : 'Select'}
               </button>
             </div>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
