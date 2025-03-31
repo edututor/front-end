@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/ChatBox.css';
 
+const REACT_APP_DOCUMENT_CHAT_URL = process.env.REACT_APP_DOCUMENT_CHAT_URL;
+
 const ChatBoxComponent = ({ selectedDocument }) => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -38,17 +40,18 @@ const ChatBoxComponent = ({ selectedDocument }) => {
 
     try {
       // API call to chat service would go here
-      const response = await fetch('/api/chat', {
+      const response = await fetch(`${REACT_APP_DOCUMENT_CHAT_URL}/api/document-chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          document_id: selectedDocument.id,
-          message: inputMessage
+          document_name: selectedDocument.name,
+          query: inputMessage
         })
       });
       
       const data = await response.json();
-      setMessages(prev => [...prev, { type: 'ai', content: data.response }]);
+      console.log(data);
+      setMessages(prev => [...prev, { type: 'ai', content: data.final_response }]);
     } catch (error) {
       setMessages(prev => [...prev, {
         type: 'ai',
