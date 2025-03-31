@@ -33,9 +33,9 @@ const Home = () => {
             selectedDocument={selectedDocument}
             onRefresh={refreshDocs}
           />
-          <QuizzesComponent 
-            selectedDocument={selectedDocument}
-          />
+            <QuizzesComponent 
+              selectedDocument={selectedDocument}
+            />
         </div>
       </div>
     </div>
