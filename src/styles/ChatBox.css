@@ -122,12 +122,6 @@
   background: var(--accent-shadow);
 }
 
-.chat-box-wrapper.no-document .chat-messages {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .upload-prompt {
   text-align: center;
   padding: 2rem;
@@ -179,4 +173,25 @@
   height: 100%;
   background: var(--accent-color);
   transition: width 0.3s ease;
+}
+
+.selected-document {
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.selected-document .label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.selected-document .doc-name {
+  background-color: var(--accent-color);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
