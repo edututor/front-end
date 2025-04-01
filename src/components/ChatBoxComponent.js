@@ -65,9 +65,10 @@ const ChatBoxComponent = ({ selectedDocument }) => {
       <div className="chat-header">
         <h2>Chat Box</h2>
         {selectedDocument && (
-          <span className="selected-document">
-            Current: {selectedDocument.name}
-          </span>
+          <div className="selected-document">
+            <span className="label">Current:</span>
+            <span className="doc-name">{selectedDocument.name}</span>
+          </div>
         )}
       </div>
 
